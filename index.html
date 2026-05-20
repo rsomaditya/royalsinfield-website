@@ -1,0 +1,930 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Royal Sinfield Club — Ride Together. Rule the Road.</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@300;400;600;700&family=Barlow:wght@300;400&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --black:   #0a0a0a;
+      --dark:    #111111;
+      --panel:   #161616;
+      --border:  #2a2a2a;
+      --gold:    #c9a84c;
+      --gold2:   #e8c97a;
+      --red:     #b52b2b;
+      --white:   #f0ece4;
+      --muted:   #888880;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--black);
+      color: var(--white);
+      font-family: 'Barlow', sans-serif;
+      font-weight: 300;
+      overflow-x: hidden;
+      cursor: none;
+    }
+
+    /* Custom cursor */
+    .cursor {
+      width: 12px; height: 12px;
+      background: var(--gold);
+      border-radius: 50%;
+      position: fixed;
+      pointer-events: none;
+      z-index: 9999;
+      transform: translate(-50%, -50%);
+      transition: transform 0.1s ease, width 0.2s, height 0.2s, background 0.2s;
+      mix-blend-mode: difference;
+    }
+    .cursor-ring {
+      width: 36px; height: 36px;
+      border: 1px solid var(--gold);
+      border-radius: 50%;
+      position: fixed;
+      pointer-events: none;
+      z-index: 9998;
+      transform: translate(-50%, -50%);
+      transition: transform 0.12s ease, width 0.3s, height 0.3s;
+      opacity: 0.5;
+    }
+
+    /* ── NAV ─────────────────────────────────────────────── */
+    nav {
+      position: fixed; top: 0; width: 100%; z-index: 100;
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 20px 60px;
+      background: linear-gradient(to bottom, rgba(10,10,10,0.95), transparent);
+      backdrop-filter: blur(2px);
+    }
+    .nav-logo {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.6rem;
+      letter-spacing: 0.15em;
+      color: var(--gold);
+      text-decoration: none;
+    }
+    .nav-logo span { color: var(--white); }
+    .nav-links { display: flex; gap: 40px; list-style: none; }
+    .nav-links a {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 600;
+      font-size: 0.8rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--muted);
+      text-decoration: none;
+      transition: color 0.3s;
+    }
+    .nav-links a:hover { color: var(--gold); }
+
+    /* ── HERO ────────────────────────────────────────────── */
+    #hero {
+      height: 100vh;
+      position: relative;
+      display: flex; align-items: center; justify-content: center;
+      overflow: hidden;
+    }
+
+    /* animated road lines background */
+    .road-bg {
+      position: absolute; inset: 0;
+      background: var(--black);
+      overflow: hidden;
+    }
+    .road-bg::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 50%;
+      width: 4px; height: 100%;
+      background: repeating-linear-gradient(
+        to bottom,
+        var(--gold) 0px, var(--gold) 60px,
+        transparent 60px, transparent 120px
+      );
+      transform: translateX(-50%);
+      animation: roadScroll 1.2s linear infinite;
+      opacity: 0.12;
+    }
+    @keyframes roadScroll { from { background-position: 0 0; } to { background-position: 0 120px; } }
+
+    /* decorative diagonal line */
+    .hero-slash {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: linear-gradient(
+        135deg,
+        transparent 0%, transparent 48%,
+        rgba(201,168,76,0.04) 48%, rgba(201,168,76,0.04) 52%,
+        transparent 52%, transparent 100%
+      );
+      pointer-events: none;
+    }
+
+    /* glowing circle behind text */
+    .hero-glow {
+      position: absolute;
+      width: 800px; height: 800px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(181,43,43,0.08) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .hero-content {
+      position: relative;
+      text-align: center;
+      animation: heroIn 1.2s cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+    @keyframes heroIn {
+      from { opacity: 0; transform: translateY(40px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .hero-eyebrow {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.4em;
+      color: var(--gold);
+      text-transform: uppercase;
+      margin-bottom: 20px;
+      display: flex; align-items: center; justify-content: center; gap: 16px;
+    }
+    .hero-eyebrow::before, .hero-eyebrow::after {
+      content: '';
+      width: 40px; height: 1px;
+      background: var(--gold);
+      opacity: 0.5;
+    }
+
+    .hero-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(5rem, 14vw, 12rem);
+      line-height: 0.88;
+      letter-spacing: 0.02em;
+      color: var(--white);
+    }
+    .hero-title .accent { color: var(--gold); }
+    .hero-title .thin {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 300;
+      font-size: clamp(2rem, 5vw, 4rem);
+      letter-spacing: 0.3em;
+      color: var(--muted);
+      display: block;
+      margin-top: 8px;
+    }
+
+    .hero-tagline {
+      margin-top: 32px;
+      font-size: 1rem;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+      font-weight: 300;
+    }
+
+    .hero-cta {
+      margin-top: 48px;
+      display: flex; gap: 16px; justify-content: center; flex-wrap: wrap;
+    }
+    .btn {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 700;
+      font-size: 0.8rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      padding: 14px 36px;
+      border: none;
+      cursor: none;
+      text-decoration: none;
+      transition: all 0.3s ease;
+      display: inline-block;
+    }
+    .btn-primary {
+      background: var(--gold);
+      color: var(--black);
+    }
+    .btn-primary:hover {
+      background: var(--gold2);
+      transform: translateY(-2px);
+      box-shadow: 0 12px 40px rgba(201,168,76,0.3);
+    }
+    .btn-outline {
+      border: 1px solid var(--border);
+      color: var(--white);
+      background: transparent;
+    }
+    .btn-outline:hover {
+      border-color: var(--gold);
+      color: var(--gold);
+      transform: translateY(-2px);
+    }
+
+    .scroll-hint {
+      position: absolute;
+      bottom: 40px; left: 50%;
+      transform: translateX(-50%);
+      display: flex; flex-direction: column; align-items: center; gap: 8px;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 0.65rem;
+      letter-spacing: 0.3em;
+      color: var(--muted);
+      text-transform: uppercase;
+      animation: bounce 2s ease infinite;
+    }
+    .scroll-hint::after {
+      content: '';
+      width: 1px; height: 40px;
+      background: linear-gradient(to bottom, var(--gold), transparent);
+    }
+    @keyframes bounce {
+      0%, 100% { transform: translateX(-50%) translateY(0); }
+      50% { transform: translateX(-50%) translateY(6px); }
+    }
+
+    /* ── TICKER ──────────────────────────────────────────── */
+    .ticker {
+      background: var(--gold);
+      color: var(--black);
+      padding: 10px 0;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+    .ticker-inner {
+      display: inline-flex; gap: 60px;
+      animation: ticker 18s linear infinite;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 700;
+      font-size: 0.75rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+    }
+    @keyframes ticker { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+    /* ── ABOUT ───────────────────────────────────────────── */
+    #about {
+      padding: 120px 60px;
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 80px;
+      align-items: center;
+    }
+    .section-label {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.4em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 20px;
+      display: flex; align-items: center; gap: 12px;
+    }
+    .section-label::before {
+      content: '';
+      width: 24px; height: 1px;
+      background: var(--gold);
+    }
+    .section-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(2.5rem, 5vw, 4.5rem);
+      line-height: 0.95;
+      letter-spacing: 0.02em;
+      margin-bottom: 24px;
+    }
+    .section-title .gold { color: var(--gold); }
+    .section-body {
+      font-size: 1rem;
+      line-height: 1.8;
+      color: var(--muted);
+      margin-bottom: 16px;
+    }
+
+    .about-visual {
+      position: relative;
+    }
+    .about-card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      padding: 48px;
+      position: relative;
+    }
+    .about-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0;
+      width: 60px; height: 3px;
+      background: var(--gold);
+    }
+    .stat-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 40px;
+    }
+    .stat-item { }
+    .stat-num {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 3.5rem;
+      color: var(--gold);
+      line-height: 1;
+    }
+    .stat-label {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 0.75rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-top: 6px;
+    }
+
+    /* ── RIDES ───────────────────────────────────────────── */
+    #rides {
+      padding: 120px 60px;
+      background: var(--dark);
+    }
+    .rides-header {
+      max-width: 1200px; margin: 0 auto 60px;
+      display: flex; justify-content: space-between; align-items: flex-end;
+    }
+    .rides-grid {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2px;
+    }
+    .ride-card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      padding: 36px 32px;
+      position: relative;
+      transition: all 0.3s ease;
+      overflow: hidden;
+    }
+    .ride-card::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0;
+      width: 0; height: 2px;
+      background: var(--gold);
+      transition: width 0.4s ease;
+    }
+    .ride-card:hover { transform: translateY(-4px); border-color: #3a3a3a; }
+    .ride-card:hover::after { width: 100%; }
+    .ride-icon {
+      font-size: 2rem;
+      margin-bottom: 20px;
+    }
+    .ride-distance {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 3rem;
+      color: var(--gold);
+      line-height: 1;
+    }
+    .ride-unit {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 0.8rem;
+      letter-spacing: 0.2em;
+      color: var(--muted);
+      text-transform: uppercase;
+    }
+    .ride-name {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 1.4rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      margin: 12px 0 8px;
+      text-transform: uppercase;
+    }
+    .ride-desc {
+      font-size: 0.85rem;
+      line-height: 1.7;
+      color: var(--muted);
+    }
+    .ride-badge {
+      position: absolute;
+      top: 20px; right: 20px;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 0.6rem;
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      padding: 4px 10px;
+      background: rgba(201,168,76,0.1);
+      border: 1px solid rgba(201,168,76,0.3);
+      color: var(--gold);
+    }
+
+    /* ── GALLERY ─────────────────────────────────────────── */
+    #gallery {
+      padding: 120px 60px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr;
+      grid-template-rows: 300px 300px;
+      gap: 4px;
+      margin-top: 60px;
+    }
+    .gallery-item {
+      position: relative;
+      overflow: hidden;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .gallery-item:first-child { grid-row: 1 / 3; }
+    .gallery-item-inner {
+      width: 100%; height: 100%;
+      display: flex; align-items: center; justify-content: center;
+      flex-direction: column;
+      gap: 12px;
+      transition: transform 0.5s ease;
+    }
+    .gallery-item:hover .gallery-item-inner { transform: scale(1.05); }
+    .gallery-emoji { font-size: 3rem; opacity: 0.4; }
+    .gallery-caption {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 0.7rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    /* ── JOIN ────────────────────────────────────────────── */
+    #join {
+      padding: 120px 60px;
+      background: var(--dark);
+    }
+    .join-inner {
+      max-width: 700px;
+      margin: 0 auto;
+      text-align: center;
+    }
+    .join-inner .section-title { font-size: clamp(3rem, 8vw, 6rem); }
+    .join-form {
+      margin-top: 48px;
+      display: flex; flex-direction: column; gap: 16px;
+    }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .form-field {
+      display: flex; flex-direction: column; gap: 8px;
+      text-align: left;
+    }
+    .form-field label {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .form-field input, .form-field select {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      color: var(--white);
+      padding: 14px 16px;
+      font-family: 'Barlow', sans-serif;
+      font-size: 0.95rem;
+      outline: none;
+      transition: border-color 0.3s;
+      cursor: none;
+    }
+    .form-field input:focus, .form-field select:focus { border-color: var(--gold); }
+    .form-field select option { background: var(--panel); }
+    .form-submit {
+      margin-top: 8px;
+    }
+    .btn-full { width: 100%; padding: 18px; font-size: 0.85rem; }
+
+    /* ── FOOTER ──────────────────────────────────────────── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 60px 60px 40px;
+      display: flex;
+      flex-direction: column;
+      gap: 40px;
+    }
+    .footer-top {
+      display: flex; justify-content: space-between; align-items: flex-start;
+      flex-wrap: wrap; gap: 40px;
+    }
+    .footer-brand .nav-logo { font-size: 2rem; }
+    .footer-tagline {
+      font-size: 0.85rem;
+      color: var(--muted);
+      margin-top: 8px;
+      max-width: 260px;
+      line-height: 1.7;
+    }
+    .footer-links {
+      display: flex; gap: 60px; flex-wrap: wrap;
+    }
+    .footer-col h4 {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 16px;
+    }
+    .footer-col ul { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+    .footer-col ul a {
+      font-size: 0.9rem;
+      color: var(--muted);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .footer-col ul a:hover { color: var(--white); }
+    .footer-bottom {
+      border-top: 1px solid var(--border);
+      padding-top: 24px;
+      display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;
+    }
+    .footer-copy {
+      font-size: 0.8rem;
+      color: var(--muted);
+      letter-spacing: 0.05em;
+    }
+    .footer-emblem {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 0.8rem;
+      letter-spacing: 0.3em;
+      color: var(--border);
+      text-transform: uppercase;
+    }
+
+    /* ── SECTION DIVIDER ─────────────────────────────────── */
+    .divider {
+      width: 100%;
+      height: 1px;
+      background: linear-gradient(to right, transparent, var(--border), transparent);
+    }
+
+    /* ── FADE-IN ANIMATION ───────────────────────────────── */
+    .fade-in {
+      opacity: 0;
+      transform: translateY(32px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+    .fade-in.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ── RESPONSIVE ──────────────────────────────────────── */
+    @media (max-width: 900px) {
+      nav { padding: 20px 24px; }
+      .nav-links { display: none; }
+      #about { grid-template-columns: 1fr; padding: 80px 24px; gap: 48px; }
+      #rides { padding: 80px 24px; }
+      .rides-grid { grid-template-columns: 1fr; }
+      .rides-header { flex-direction: column; align-items: flex-start; gap: 16px; }
+      #gallery { padding: 80px 24px; }
+      .gallery-grid { grid-template-columns: 1fr 1fr; grid-template-rows: auto; }
+      .gallery-item:first-child { grid-row: auto; grid-column: 1 / -1; height: 280px; }
+      #join { padding: 80px 24px; }
+      .form-row { grid-template-columns: 1fr; }
+      footer { padding: 48px 24px 32px; }
+      .footer-top { flex-direction: column; }
+      .footer-bottom { flex-direction: column; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Custom Cursor -->
+  <div class="cursor" id="cursor"></div>
+  <div class="cursor-ring" id="cursorRing"></div>
+
+  <!-- NAV -->
+  <nav>
+    <a href="#hero" class="nav-logo">Royal<span>Sinfield</span></a>
+    <ul class="nav-links">
+      <li><a href="#about">About</a></li>
+      <li><a href="#rides">Rides</a></li>
+      <li><a href="#gallery">Gallery</a></li>
+      <li><a href="#join">Join Us</a></li>
+    </ul>
+  </nav>
+
+  <!-- HERO -->
+  <section id="hero">
+    <div class="road-bg"></div>
+    <div class="hero-slash"></div>
+    <div class="hero-glow"></div>
+
+    <div class="hero-content">
+      <div class="hero-eyebrow">Est. 2024 &nbsp;·&nbsp; India</div>
+      <h1 class="hero-title">
+        Royal<br>
+        <span class="accent">Sinfield</span><br>
+        <span class="thin">Club</span>
+      </h1>
+      <p class="hero-tagline">Ride Together. Rule the Road. Leave No Man Behind.</p>
+      <div class="hero-cta">
+        <a href="#join" class="btn btn-primary">Join the Club</a>
+        <a href="#rides" class="btn btn-outline">Explore Rides</a>
+      </div>
+    </div>
+
+    <div class="scroll-hint">Scroll</div>
+  </section>
+
+  <!-- TICKER -->
+  <div class="ticker" aria-hidden="true">
+    <div class="ticker-inner">
+      <span>🏍️ Royal Sinfield Club</span>
+      <span>— Ride Together</span>
+      <span>🏍️ Brotherhood on Two Wheels</span>
+      <span>— Rule the Road</span>
+      <span>🏍️ Mountain Passes</span>
+      <span>— Coastal Highways</span>
+      <span>🏍️ Weekend Rides</span>
+      <span>— Long Tours</span>
+      <span>🏍️ Royal Sinfield Club</span>
+      <span>— Ride Together</span>
+      <span>🏍️ Brotherhood on Two Wheels</span>
+      <span>— Rule the Road</span>
+      <span>🏍️ Mountain Passes</span>
+      <span>— Coastal Highways</span>
+      <span>🏍️ Weekend Rides</span>
+      <span>— Long Tours</span>
+    </div>
+  </div>
+
+  <!-- ABOUT -->
+  <section id="about">
+    <div class="fade-in">
+      <div class="section-label">Who We Are</div>
+      <h2 class="section-title">Born To<br><span class="gold">Ride</span></h2>
+      <p class="section-body">Royal Sinfield Club is a community of passionate riders united by a love for the open road, Royal Enfield machines, and the freedom that comes with every kilometre.</p>
+      <p class="section-body">From weekend city escapes to multi-day Himalayan expeditions, we ride as one — respecting the road, each other, and the machines we trust our lives to.</p>
+      <a href="#join" class="btn btn-primary" style="margin-top: 24px; display: inline-block;">Become a Member</a>
+    </div>
+    <div class="about-visual fade-in">
+      <div class="about-card">
+        <div class="stat-grid">
+          <div class="stat-item">
+            <div class="stat-num">200+</div>
+            <div class="stat-label">Active Riders</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-num">50+</div>
+            <div class="stat-label">Rides Done</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-num">12</div>
+            <div class="stat-label">States Covered</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-num">1</div>
+            <div class="stat-label">Brotherhood</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- RIDES -->
+  <section id="rides">
+    <div class="rides-header fade-in">
+      <div>
+        <div class="section-label">Upcoming & Past</div>
+        <h2 class="section-title" style="margin-bottom:0">Our <span class="gold">Rides</span></h2>
+      </div>
+      <a href="#join" class="btn btn-outline">Join a Ride</a>
+    </div>
+
+    <div class="rides-grid">
+      <div class="ride-card fade-in">
+        <div class="ride-badge">Upcoming</div>
+        <div class="ride-icon">🏔️</div>
+        <div class="ride-distance">1,200</div>
+        <div class="ride-unit">km</div>
+        <div class="ride-name">Spiti Valley Expedition</div>
+        <div class="ride-desc">Manali to Kaza via the world's highest motorable roads. 6 days of pure mountain riding through barren lunar landscapes.</div>
+      </div>
+      <div class="ride-card fade-in">
+        <div class="ride-badge">Monthly</div>
+        <div class="ride-icon">🌅</div>
+        <div class="ride-distance">300</div>
+        <div class="ride-unit">km</div>
+        <div class="ride-name">Sunrise Weekend Ride</div>
+        <div class="ride-desc">Every first Sunday. Pre-dawn departure, chai at the hilltop dhaba, back by noon. The perfect weekly reset.</div>
+      </div>
+      <div class="ride-card fade-in">
+        <div class="ride-badge">Completed</div>
+        <div class="ride-icon">🌊</div>
+        <div class="ride-distance">800</div>
+        <div class="ride-unit">km</div>
+        <div class="ride-name">Coastal Highway Run</div>
+        <div class="ride-desc">NH66 along the Konkan coast — sea breeze, sea food, and the most scenic highway in India. Unforgettable.</div>
+      </div>
+      <div class="ride-card fade-in">
+        <div class="ride-icon">🌲</div>
+        <div class="ride-distance">500</div>
+        <div class="ride-unit">km</div>
+        <div class="ride-name">Forest Trails</div>
+        <div class="ride-desc">Winding roads through dense Western Ghats forests. A rider's paradise with zero traffic and maximum soul.</div>
+      </div>
+      <div class="ride-card fade-in">
+        <div class="ride-badge">Annual</div>
+        <div class="ride-icon">🏜️</div>
+        <div class="ride-distance">2,500</div>
+        <div class="ride-unit">km</div>
+        <div class="ride-name">Desert Odyssey</div>
+        <div class="ride-desc">Rajasthan's royal routes — Sam Dunes at sunset, Jaisalmer at dawn, the golden triangle on two wheels.</div>
+      </div>
+      <div class="ride-card fade-in">
+        <div class="ride-icon">⛰️</div>
+        <div class="ride-distance">150</div>
+        <div class="ride-unit">km</div>
+        <div class="ride-name">City Escape Rides</div>
+        <div class="ride-desc">Quick weekend escapes to the nearest hills. Perfect for new members. No experience required — just a full tank.</div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- GALLERY -->
+  <section id="gallery">
+    <div class="fade-in">
+      <div class="section-label">Memories</div>
+      <h2 class="section-title">On The <span class="gold">Road</span></h2>
+    </div>
+    <div class="gallery-grid">
+      <div class="gallery-item fade-in" style="background: linear-gradient(135deg, #161616, #1e1810);">
+        <div class="gallery-item-inner">
+          <div class="gallery-emoji">🏍️</div>
+          <div class="gallery-caption">Spiti Valley 2024</div>
+        </div>
+      </div>
+      <div class="gallery-item fade-in" style="background: linear-gradient(135deg, #161616, #101818);">
+        <div class="gallery-item-inner">
+          <div class="gallery-emoji">🌄</div>
+          <div class="gallery-caption">Himalayan Sunrise</div>
+        </div>
+      </div>
+      <div class="gallery-item fade-in" style="background: linear-gradient(135deg, #161616, #181018);">
+        <div class="gallery-item-inner">
+          <div class="gallery-emoji">🏕️</div>
+          <div class="gallery-caption">Camp Night</div>
+        </div>
+      </div>
+      <div class="gallery-item fade-in" style="background: linear-gradient(135deg, #161616, #181610);">
+        <div class="gallery-item-inner">
+          <div class="gallery-emoji">🌊</div>
+          <div class="gallery-caption">Coastal Highway</div>
+        </div>
+      </div>
+      <div class="gallery-item fade-in" style="background: linear-gradient(135deg, #161616, #101610);">
+        <div class="gallery-item-inner">
+          <div class="gallery-emoji">☕</div>
+          <div class="gallery-caption">Chai Break</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- JOIN -->
+  <section id="join">
+    <div class="join-inner">
+      <div class="fade-in">
+        <div class="section-label">Ride With Us</div>
+        <h2 class="section-title">Join the <span class="gold">Brotherhood</span></h2>
+        <p class="section-body">Whether you're a seasoned tourer or just got your first bike — you belong here. Fill in the form and we'll reach out with your first ride invite.</p>
+      </div>
+      <div class="join-form fade-in">
+        <div class="form-row">
+          <div class="form-field">
+            <label>Your Name</label>
+            <input type="text" placeholder="Arjun Singh" />
+          </div>
+          <div class="form-field">
+            <label>Phone Number</label>
+            <input type="tel" placeholder="+91 98765 43210" />
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-field">
+            <label>Your City</label>
+            <input type="text" placeholder="Mumbai, Delhi, Bangalore..." />
+          </div>
+          <div class="form-field">
+            <label>Your Bike</label>
+            <select>
+              <option value="">Select your machine</option>
+              <option>Royal Enfield Classic 350</option>
+              <option>Royal Enfield Meteor 350</option>
+              <option>Royal Enfield Himalayan</option>
+              <option>Royal Enfield Thunderbird</option>
+              <option>Royal Enfield Bullet 350</option>
+              <option>Royal Enfield Super Meteor 650</option>
+              <option>Royal Enfield Continental GT 650</option>
+              <option>Other</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-field">
+          <label>Email Address</label>
+          <input type="email" placeholder="rider@email.com" />
+        </div>
+        <div class="form-submit">
+          <button class="btn btn-primary btn-full" onclick="handleJoin()">Request Membership →</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-top">
+      <div class="footer-brand">
+        <a href="#hero" class="nav-logo">Royal<span>Sinfield</span></a>
+        <p class="footer-tagline">A brotherhood of riders. United by passion, guided by the horizon.</p>
+      </div>
+      <div class="footer-links">
+        <div class="footer-col">
+          <h4>Navigate</h4>
+          <ul>
+            <li><a href="#about">About the Club</a></li>
+            <li><a href="#rides">Rides & Events</a></li>
+            <li><a href="#gallery">Gallery</a></li>
+            <li><a href="#join">Join Us</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Connect</h4>
+          <ul>
+            <li><a href="#">Instagram</a></li>
+            <li><a href="#">YouTube</a></li>
+            <li><a href="#">WhatsApp Group</a></li>
+            <li><a href="#">Contact Us</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div class="footer-copy">© 2024 Royal Sinfield Club · www.royalsinfield.club</div>
+      <div class="footer-emblem">Ride Together · Rule the Road</div>
+    </div>
+  </footer>
+
+  <script>
+    // Custom Cursor
+    const cursor = document.getElementById('cursor');
+    const ring = document.getElementById('cursorRing');
+    let mx = 0, my = 0, rx = 0, ry = 0;
+    document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
+    function animateCursor() {
+      cursor.style.left = mx + 'px'; cursor.style.top = my + 'px';
+      rx += (mx - rx) * 0.12; ry += (my - ry) * 0.12;
+      ring.style.left = rx + 'px'; ring.style.top = ry + 'px';
+      requestAnimationFrame(animateCursor);
+    }
+    animateCursor();
+
+    // Fade-in on scroll
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach((e, i) => {
+        if (e.isIntersecting) {
+          setTimeout(() => e.target.classList.add('visible'), 100 * (Array.from(e.target.parentElement.children).indexOf(e.target)));
+          observer.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.15 });
+    document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+
+    // Join form
+    function handleJoin() {
+      const btn = document.querySelector('.form-submit .btn');
+      btn.textContent = '✓ Request Sent! We\'ll reach out soon.';
+      btn.style.background = '#2a6b2a';
+      btn.style.cursor = 'none';
+    }
+
+    // Nav hide/show on scroll
+    let lastY = 0;
+    window.addEventListener('scroll', () => {
+      const nav = document.querySelector('nav');
+      const y = window.scrollY;
+      nav.style.opacity = y > lastY && y > 100 ? '0' : '1';
+      lastY = y;
+    });
+  </script>
+</body>
+</html>
